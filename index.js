@@ -29,9 +29,9 @@ var checkContainment = function(array1, array2){
   // returns 1 if any item in array1 is contained in array2
   // returns 2 if both items in arrays 2 are in array1
   // returns 0 if none are contained.
-  var output = 0;;
+  var output = 0
   for (var i in array1){
-    if (array2.includes(array1[i])){output++};
+    if (array2.includes(array1[i])){output++}
   }  
   return output;  
 }
@@ -39,85 +39,85 @@ var checkContainment = function(array1, array2){
 var STAB = function(attackType, oppType){
 	//attackType is a string of the type of attack being made
 	//oppType is an array of pokemon types of the attack target
-
-	var multiplyer = 1;
+	var effective, noneffective;
 	switch (attackType){
 		case "normal":
 			// effective
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment([""], oppType));
+			effective = checkContainment([""], oppType);
 			// not effective
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(["Ghost","Rock","Steel"], oppType));
+			noneffective = checkContainment(["Ghost","Rock","Steel"], oppType);
 			break;
 		case "Fire":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Grass","Ice","Bug","Steel"], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(["Fire","Water","Rock","Dragon"], oppType));
+			effective = checkContainment(["Grass","Ice","Bug","Steel"], oppType);
+			noneffective = checkContainment(["Fire","Water","Rock","Dragon"], oppType);
 			break;
 		case "Water":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Fire","Ground","Rock"], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(["Water","Grass","Dragon"], oppType));
+			effective = checkContainment(["Fire","Ground","Rock"], oppType);
+			noneffective = checkContainment(["Water","Grass","Dragon"], oppType);
 			break;
 		case "Electric":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Water","Flying"], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(["Ground","Electric","Grass","Dragon"], oppType));
+			effective = checkContainment(["Water","Flying"], oppType);
+			noneffective = checkContainment(["Ground","Electric","Grass","Dragon"], oppType);
 			break;
 		case "Grass":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Water","Ground","Rock"], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(["Fire","Grass","Poison","Flying","Bug",'Dragon','Steel'], oppType));
+			effective = checkContainment(["Water","Ground","Rock"], oppType);
+			noneffective = checkContainment(["Fire","Grass","Poison","Flying","Bug",'Dragon','Steel'], oppType);
 			break;
 		case "Ice":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Grass",'Ground','Flying','Dragon'], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(["Fire","Water","Ice",'Steel'], oppType));
+			effective = checkContainment(["Grass",'Ground','Flying','Dragon'], oppType);
+			noneffective = checkContainment(["Fire","Water","Ice",'Steel'], oppType);
 			break;
 		case "Fight":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Normal","Ice",'Rock','Dark','Steel'], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(["Ghost","Poison","Flying",'Psychic','Bug','Fairy'], oppType));
+			effective = checkContainment(["Normal","Ice",'Rock','Dark','Steel'], oppType);
+			noneffective = checkContainment(["Ghost","Poison","Flying",'Psychic','Bug','Fairy'], oppType);
 			break;
 		case "Poison":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Grass",'Fairy'], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(["Steel","Poison","Ground",'Rock','Ghost'], oppType));
+			effective = checkContainment(["Grass",'Fairy'], oppType);
+			noneffective = checkContainment(["Steel","Poison","Ground",'Rock','Ghost'], oppType);
 			break;
 		case "Ground":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Fire",'Electric','Poison','Rock','Steel'], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(['Flying','Grass','Bug'], oppType));
+			effective = checkContainment(["Fire",'Electric','Poison','Rock','Steel'], oppType);
+			noneffective = checkContainment(['Flying','Grass','Bug'], oppType);
 			break;
 		case "Flying":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Grass",'Fight','Bug'], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(['Electric','Rock','Steel'], oppType));
+			effective = checkContainment(["Grass",'Fight','Bug'], oppType);
+			noneffective = checkContainment(['Electric','Rock','Steel'], oppType);
 			break;
 		case "Psychic":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Fight",'Poison'], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(['Dark',"Psychic",'Steel'], oppType));
+			effective = checkContainment(["Fight",'Poison'], oppType);
+			noneffective = checkContainment(['Dark',"Psychic",'Steel'], oppType);
 			break;
 		case "Bug":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Grass",'Psychic','Dark'], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(['Fire','Fight','Poison','Flying','Ghost','Steel','Fairy'], oppType));
+			effective = checkContainment(["Grass",'Psychic','Dark'], oppType);
+			noneffective = checkContainment(['Fire','Fight','Poison','Flying','Ghost','Steel','Fairy'], oppType);
 			break;
 		case "Rock":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Fire",'Ice','Flying','Bug'], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(['Fight','Ground','Steel'], oppType));
+			effective = checkContainment(["Fire",'Ice','Flying','Bug'], oppType);
+			noneffective = checkContainment(['Fight','Ground','Steel'], oppType);
 			break;
 		case "Ghost":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Psychic",'Ghost'], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(['Normal','Dark'], oppType));
+			effective = checkContainment(["Psychic",'Ghost'], oppType);
+			noneffective = checkContainment(['Normal','Dark'], oppType);
 			break;
 		case "Dragon":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Dragon"], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(['Fairy','Steel'], oppType));
+			effective = checkContainment(["Dragon"], oppType);
+			noneffective = checkContainment(['Fairy','Steel'], oppType);
 			break;
 		case "Dark":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Psychic",'Ghost'], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(['Fight','Dark','Fairy'], oppType));
+			effective = checkContainment(["Psychic",'Ghost'], oppType);
+			noneffective = checkContainment(['Fight','Dark','Fairy'], oppType);
 			break;
 		case "Steel":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Ice",'Rock','Fairy'], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(['Fire','Water','Electric','Steel'], oppType));
+			effective = checkContainment(["Ice",'Rock','Fairy'], oppType);
+			noneffective = checkContainment(['Fire','Water','Electric','Steel'], oppType);
 			break;
 		case "Fairy":
-			multiplyer = multiplyer * Math.pow(1.25, checkContainment(["Fight",'Rock','Fairy'], oppType));
-			multiplyer = multiplyer * Math.pow(.8, checkContainment(['Fire','Poison','Steel'], oppType));
+			effective = checkContainment(["Fight",'Rock','Fairy'], oppType);
+			noneffective = checkContainment(['Fire','Poison','Steel'], oppType);
 			break;
 	}
-	return multiplyer;
+
+	return 1*Math.pow(1.25, effective)*Math.pow(.8,noneffective);
 }
 
 var calcDmg = function(pokemon, opp){
@@ -126,20 +126,13 @@ var calcDmg = function(pokemon, opp){
 
 var Pokemon = function(obj){
 	//will convert original pokemon object into my own (with less info)
-"Number"
-"Name"
-"Generation"
-"About"
-"Types"
-"Resistant"
-"Weaknesses"
-"Fast Attack(s)"
-"Special Attack(s)"
-"Base Stamina"
-"Base Attack"
-"Base Defense"
-"MaxCP" //combat power
-"MaxHP" //max HP
+	for (var i in []){
+		if( ["Fast Attack(s)","Special Attack(s)"].includes(i)){
+			this[i]=getHighestDPS(obj[i]);
+		}else if (["Number","Name","Generation","About","Types","Base Stamina","Base Attack","Base Defense","MaxCP","MaxHP"].includes(i)){
+			this[i]=obj[i];
+		}
+	}
 }
 
 var printPoke = function(obj){
@@ -150,3 +143,8 @@ var printPoke = function(obj){
 
 // Info on dmg calc
 // https://pokemongo.gamepress.gg/damage-mechanics
+
+var myPokemon = []
+for (var i in whole){
+	myPokemon.push(new Pokemon(whole[i]));
+}
