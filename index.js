@@ -36,12 +36,12 @@ var checkContainment = function(array1, array2){
   return output;  
 }
 
-var STAB = function(attackType, oppType){
+var effectiveness = function(attackType, oppType){
 	//attackType is a string of the type of attack being made
 	//oppType is an array of pokemon types of the attack target
 	var effective, noneffective;
 	switch (attackType){
-		case "normal":
+		case "Normal":
 			// effective
 			effective = checkContainment([""], oppType);
 			// not effective
@@ -116,21 +116,64 @@ var STAB = function(attackType, oppType){
 			noneffective = checkContainment(['Fire','Poison','Steel'], oppType);
 			break;
 	}
-
 	return 1*Math.pow(1.25, effective)*Math.pow(.8,noneffective);
 }
 
-var calcDmg = function(pokemon, opp){
+var calcDmg = function(attack,pokemon, opp){
+	// pokemon and opp are Pokemon objects
 
+	//assumes max level 40 pokemon
+	var CpM = 0.79030001;
+
+	if(pokemon.Types.includes(attack.Type)){
+		var STAB = 1.25; //increased dmg when pokemon matches attackType
+	}else{
+		var STAB = 1;
+	}
+	var power = attack.Damage;
+	var atkDef = pokemon.atk/opp.def;
+	return Math.floor(.5 * power * atkDef * STAB * effectiveness(attack.Type,opp.Types))+1;
 }
 
 var Pokemon = function(obj){
 	//will convert original pokemon object into my own (with less info)
-	for (var i in []){
+	for (var i in obj){
 		if( ["Fast Attack(s)","Special Attack(s)"].includes(i)){
 			this[i]=getHighestDPS(obj[i]);
-		}else if (["Number","Name","Generation","About","Types","Base Stamina","Base Attack","Base Defense","MaxCP","MaxHP"].includes(i)){
+		}else if (["Base Stamina","Base Attack","Base Defense"].includes(i)){
+			this[i]=Number(obj[i].split(" ")[0]);
+		}else if(["Number","Name","Generation","About","Types","MaxCP","MaxHP"].includes(i)){
 			this[i]=obj[i];
+		}
+	}
+}
+
+var TempPokemon = function(obj, flag = false){
+	//will create a temporary pokemon with random stats for player
+	this.stamIV = flag?15:Math.floor(Math.random()*16);
+	this.attIV = flag?15:Math.floor(Math.random()*16);
+	this.defIV = flag?15:Math.floor(Math.random()*16);
+	for( var i in obj){
+		this[i]=obj[i];
+	}
+	this.hp = Math.floor((this.stamIV+this["Base Stamina"])*0.79030001);
+	this.atk = (this.stamIV+this["Base Attack"])*0.79030001;
+	this.def = (this.stamIV+this["Base Defense"])*0.79030001;
+
+	this.sumStats = this.stamIV+this.attIV+this.defIV;
+	this.appraise = function(){
+		// Great (82%-100% / 37-45) - Overall, your (Pokémon) is a wonder! What a breathtaking Pokemon!
+		// Good (67%-80%) - Overall, your (Pokémon) has certainly caught my attention.
+		// OK (51%-49%) - Overall, your (Pokémon) is above average.
+		// Bad (0% to 49%) - Overall, your (Pokémon) is not likely to make much headway in battle.
+		if (this.sumStats>36){
+			console.log("Overall, your "+this.Name+" is a wonder! What a breathtaking Pokemon!");
+		}else if(this.sumStats>29){
+			console.log("Overall, your "+this.Name+" has certainly caught my attention.");
+		}else if(this.sumStats>22){
+			console.log("Overall, your "+this.Name+" is above average.");
+		}else{
+			console.log("Overall, your "+this.Name+" is not likely to make much headway in battle.");
 		}
 	}
 }
@@ -144,7 +187,12 @@ var printPoke = function(obj){
 // Info on dmg calc
 // https://pokemongo.gamepress.gg/damage-mechanics
 
-var myPokemon = []
+var allPokemon = []
 for (var i in whole){
-	myPokemon.push(new Pokemon(whole[i]));
+	allPokemon.push(new Pokemon(whole[i]));
 }
+
+first = new TempPokemon(allPokemon[1])
+second = new TempPokemon(allPokemon[100])
+atk = allPokemon[0]['Fast Attack(s)']
+calcDmg(atk, first, second)
