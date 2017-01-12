@@ -14,17 +14,10 @@ var getHighestDPS = function(obj){
 	return output;
 }
 
-// Pokemon are randomly given stats like "genes" for Attack, defense, and health
-// Perfect rolls on these stats are 15/15/15
 
 // Each stat is multiplied by a level coefficient (level 40) 0.79030001
 // Taken from https://pokemongo.gamepress.gg/cp-multiplier
 
-// Allow for "Appraisal" of pokemon
-// Great (82%-100% / 37-45) - Overall, your (Pokémon) is a wonder! What a breathtaking Pokemon!
-// Good (67%-80%) - Overall, your (Pokémon) has certainly caught my attention.
-// OK (51%-49%) - Overall, your (Pokémon) is above average.
-// Bad (0% to 49%) - Overall, your (Pokémon) is not likely to make much headway in battle.
 var checkContainment = function(array1, array2){
   // returns 1 if any item in array1 is contained in array2
   // returns 2 if both items in arrays 2 are in array1
@@ -150,9 +143,14 @@ var Pokemon = function(obj){
 
 var TempPokemon = function(obj, flag = false){
 	//will create a temporary pokemon with random stats for player
+
+	// Pokemon are randomly given stats like "genes" for Attack, defense, and health
+	// Perfect rolls on these stats are 15/15/15
+	// flag = true will give perfect stats
 	this.stamIV = flag?15:Math.floor(Math.random()*16);
 	this.attIV = flag?15:Math.floor(Math.random()*16);
 	this.defIV = flag?15:Math.floor(Math.random()*16);
+
 	for( var i in obj){
 		this[i]=obj[i];
 	}
@@ -178,11 +176,11 @@ var TempPokemon = function(obj, flag = false){
 	}
 }
 
-var printPoke = function(obj){
-	for (var i in obj){
-		console.log(i + " : " + obj[i]);
-	}
-}
+// var printPoke = function(obj){
+// 	for (var i in ["Number","Name","Generation","About","Types"]){
+// 		console.log(i + " : " + obj[i]);
+// 	}
+// }
 
 // Info on dmg calc
 // https://pokemongo.gamepress.gg/damage-mechanics
@@ -196,3 +194,64 @@ first = new TempPokemon(allPokemon[1])
 second = new TempPokemon(allPokemon[100])
 atk = allPokemon[0]['Fast Attack(s)']
 calcDmg(atk, first, second)
+
+var replaceLow = function(array, pokemon){
+	// returns array with highest maxCP Pokemon
+	var temp = array;
+	for (var i in array){
+		if(array[i].MaxCP<pokemon.MaxCP){
+			temp[i]=pokemon;
+			return temp;
+		}
+	}
+	return array;
+}
+
+var findBestSix = function(){
+	var tempOut = []
+	var output = []
+	for (var i in allPokemon){
+		if (tempOut.length<6){
+			tempOut.push(allPokemon[i]);
+		}else{
+			tempOut = replaceLow(tempOut, allPokemon[i]);
+		}
+	}
+	for (var k in tempOut){
+		output.push(new TempPokemon(tempOut[k],true));
+	}
+	return sortLowestFirst(output);
+}
+
+var sortLowestFirst = function(array){
+	//sorts pokemon list in order of lowest MaxCP first
+	return array.sort((a,b)=>a.MaxCP-b.MaxCP);
+}
+
+var randPokeGroup = function(){
+	var output = [];
+	for (var i = 0; i <6; i++){
+		output.push(new TempPokemon(allPokemon[Math.floor(Math.random()*allPokemon.length)]));
+	}
+	return output;
+}
+
+var PokeGroup = function(){
+	this.group = randPokeGroup();
+
+	this.appraise = function(){
+		for(var i in this.group){
+			this.group[i].appraise();
+		}
+	}
+}
+
+var EnemyGroup = function(){
+	this.group = findBestSix();
+
+	this.appraise = function(){
+		for(var i in this.group){
+			this.group[i].appraise();
+		}
+	}
+}
