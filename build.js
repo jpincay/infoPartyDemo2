@@ -3,7 +3,7 @@ var whole = [{"Number":"001","Name":"Bulbasaur","Generation":"Generation I","Abo
 // whole.length = 251 pokemon
 // Object.keys(whole[0]) = ["Number", "Name", "Generation", "About", "Types", "Resistant", "Weaknesses", "Fast Attack(s)", "Special Attack(s)", "Weight", "Height", "Buddy Distance", "Base Stamina", "Base Attack", "Base Defense", "Base Flee Rate", "Previous evolution(s)", "Next Evolution Requirements", "Next evolution(s)", "MaxCP", "MaxHP"]
 
-getHighestDPS = function(obj){
+var getHighestDPS = function(obj){
 	//gets highest dps attack from a pokemon's array of attack objects
 	var output = {Damage:0};
 	for (var i in obj){
@@ -18,7 +18,7 @@ getHighestDPS = function(obj){
 // Each stat is multiplied by a level coefficient (level 40) 0.79030001
 // Taken from https://pokemongo.gamepress.gg/cp-multiplier
 
-checkContainment = function(array1, array2){
+var checkContainment = function(array1, array2){
   // returns 1 if any item in array1 is contained in array2
   // returns 2 if both items in arrays 2 are in array1
   // returns 0 if none are contained.
@@ -29,7 +29,7 @@ checkContainment = function(array1, array2){
   return output;  
 }
 
-effectiveness = function(attackType, oppType){
+var effectiveness = function(attackType, oppType){
 	//attackType is a string of the type of attack being made
 	//oppType is an array of pokemon types of the attack target
 	var effective, noneffective;
@@ -112,7 +112,7 @@ effectiveness = function(attackType, oppType){
 	return 1*Math.pow(1.25, effective)*Math.pow(.8,noneffective);
 }
 
-calcDmg = function(attack,pokemon, opp){
+var calcDmg = function(attack,pokemon, opp){
 	// pokemon and opp are Pokemon objects
 
 	//assumes max level 40 pokemon
@@ -128,7 +128,7 @@ calcDmg = function(attack,pokemon, opp){
 	return Math.floor(.5 * power * atkDef * STAB * effectiveness(attack.Type,opp.Types))+1;
 }
 
-Pokemon = function(obj){
+var Pokemon = function(obj){
 	//will convert original pokemon object into my own (with less info)
 	for (var i in obj){
 		if( ["Fast Attack(s)","Special Attack(s)"].includes(i)){
@@ -141,7 +141,7 @@ Pokemon = function(obj){
 	}
 }
 
-TempPokemon = function(obj, flag = false){
+var TempPokemon = function(obj, flag = false){
 	//will create a temporary pokemon with random stats for player
 
 	// Pokemon are randomly given stats like "genes" for Attack, defense, and health
@@ -195,7 +195,7 @@ for (var i in whole){
 // atk = allPokemon[0]['Fast Attack(s)']
 // calcDmg(atk, first, second)
 
-replaceLow = function(array, pokemon){
+var replaceLow = function(array, pokemon){
 	// returns array with highest maxCP Pokemon
 	var temp = array;
 	for (var i in array){
@@ -207,7 +207,7 @@ replaceLow = function(array, pokemon){
 	return array;
 }
 
-findBestSix = function(){
+var findBestSix = function(){
 	var tempOut = []
 	var output = []
 	for (var i in allPokemon){
@@ -223,12 +223,12 @@ findBestSix = function(){
 	return sortLowestFirst(output);
 }
 
-sortLowestFirst = function(array){
+var sortLowestFirst = function(array){
 	//sorts pokemon list in order of lowest MaxCP first
 	return array.sort((a,b)=>a.MaxCP-b.MaxCP);
 }
 
-randPokeGroup = function(){
+var randPokeGroup = function(){
 	var output = [];
 	for (var i = 0; i <6; i++){
 		output.push(new TempPokemon(allPokemon[Math.floor(Math.random()*allPokemon.length)]));
@@ -236,7 +236,7 @@ randPokeGroup = function(){
 	return output;
 }
 
-PokeGroup = function(){
+var PokeGroup = function(){
 	this.group = randPokeGroup();
 
 	this.appraise = function(){
@@ -246,7 +246,7 @@ PokeGroup = function(){
 	}
 }
 
-EnemyGroup = function(){
+var EnemyGroup = function(){
 	this.group = findBestSix();
 
 	this.appraise = function(){
@@ -256,3 +256,19 @@ EnemyGroup = function(){
 	}
 }
 
+
+module.exports ={
+whole : whole,
+getHighestDPS : getHighestDPS,
+checkContainment : checkContainment,
+effectiveness : effectiveness,
+calcDmg : calcDmg,
+Pokemon : Pokemon,
+TempPokemon : TempPokemon,
+replaceLow : replaceLow,
+findBestSix : findBestSix,
+sortLowestFirst : sortLowestFirst,
+randPokeGroup : randPokeGroup,
+PokeGroup : PokeGroup,
+EnemyGroup : EnemyGroup
+}
