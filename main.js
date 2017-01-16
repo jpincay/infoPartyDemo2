@@ -2,5 +2,5 @@
 // require("./build.js");
 //executing game logic
 var x = require("./pokemonCLI.js");
-new x.PokemonCLI().call();
-
+var newGame = new x.PokemonCLI();
+newGame.call();
