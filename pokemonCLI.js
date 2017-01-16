@@ -51,11 +51,12 @@ var PokemonCLI = function(){
 		console.log("You have the following Pokemon (a group you've filtered from 10,000 groups of random Pokemon)");
 		this.player.printGroup();
 		console.log("===================================");
-		console.log("Time to battle! Your score is calculated by the amount of damage you do to the enemy team (Max of " + this.enemy.FULLHP +" )");
+		console.log("Time to battle! Your score is calculated by the amount of damage you do to the enemy team (Max of " + this.enemy.FULLHP +")");
 	}
 
 	this.startGame = function(){
 		// Ask which pokemon to use first?
+		console.log("Your opponent sent out " + this.enemy.currentPokemon.Name + "!");
 		console.log("Select a pokemon to go first")
 		for(var i in this.player.group){
 			console.log((Number(i)+1) + ". "+ this.player.group[i].Name);
@@ -69,8 +70,8 @@ var PokemonCLI = function(){
 			// Looping until pokemon is fainted
 			var enemyMove, playerMove, newPick, choices;
 			while (!this.player.fainted()&&!this.enemy.fainted()){
-				console.log(this.player.sumHP());
-				console.log(this.enemy.sumHP());
+				// console.log(this.player.sumHP());
+				// console.log(this.enemy.sumHP());
 				//enemy goes first b/c "perfect"
 				enemyMove = this.enemy.dealDmg(this.player.currentPokemon);
 				this.enemyDmg = this.enemyDmg + enemyMove.Damage; //keeping track of all dmg dealt
@@ -86,10 +87,12 @@ var PokemonCLI = function(){
 			if(this.player.fainted() && this.player.sumHP()>0){
 				console.log("Your " + this.player.currentPokemon.Name + " fainted! Pick a new pokemon.");
 				choices = "";
-				this.player.printGroup();
 				for( var i in this.player.group){
 					if (this.player.group[i].hp>0){
 						choices = choices + (Number(i)+1);
+						console.log((Number(i)+1)+". " + this.player.group[i].Name + " STATUS: OK");
+					}else{
+						console.log((Number(i)+1)+". " + this.player.group[i].Name + " STATUS: Fainted");
 					}
 				}
 				newPick = query("Which pokemon do you want to go next?", choices,false);
@@ -113,7 +116,7 @@ var PokemonCLI = function(){
 
 	this.changeEnemyPoke = function(){
 		for(var i in this.enemy.group){
-			if(this.enemy.group[i]>0){
+			if(this.enemy.group[i].hp>0){
 				this.enemy.currentPokemon = this.enemy.group[i];
 				return
 			}
