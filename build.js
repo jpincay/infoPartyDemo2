@@ -116,6 +116,7 @@ var effectiveness = function(attackType, oppType){
 
 var calcDmg = function(attack,pokemon, opp){
 	// pokemon and opp are Pokemon objects
+	// attack is an attack object {Name: "", Type: "", Damage: ##}
 
 	//assumes max level 40 pokemon
 	var CpM = 0.79030001;
@@ -177,6 +178,15 @@ var TempPokemon = function(obj, flag = false){
 			console.log("Overall, your "+this.Name+" is not likely to make much headway in battle.");
 		}
 	}
+
+	this.takeDmg = function(num){
+		// takes dmg into current pokemon
+		this.hp = this.hp - num
+		if (this.hp < 0){
+			this.hp = 0;
+		}
+	}
+
 }
 
 // var printPoke = function(obj){
@@ -251,7 +261,7 @@ var PokeGroup = function(){
 	}
 
 	bigGroup  = undefined;
-	this.currentPokemon;
+	this.currentPokemon = this.group[0]; //setting pokemon by default, but not needed
 
 	this.appraise = function(){
 		for(var i in this.group){
@@ -268,6 +278,36 @@ var PokeGroup = function(){
 				console.log("NAME: "+this.group[i].Name + " TYPE : " + types + " HP: " + this.group[i].hp + " ATK: " + Math.floor(this.group[i].atk) + " DEF: " + Math.floor(this.group[i].def));
 			}
 		}		
+	}
+
+	this.fainted = function(){
+		return this.currentPokemon.hp==0;
+	}
+	
+	this.sumHP = function(){
+		var output = 0;
+		for(var i in this.group){
+			output = output +this.group[i].hp;
+		}
+		return output;
+	}
+
+	this.dealDmg = function(attack,oppPoke){
+		// player pokemon does an attack on oppPoke, dealing dmg to it
+		oppPoke.takeDmg(calcDmg(attack,this.currentPokemon, oppPoke));
+	}
+
+	this.dealDmg = function(oppPoke){
+		// deals current pokemon's best dmg to oppPoke argument
+		var attack1 = calcDmg(this.currentPokemon["Fast Attack(s)"], this.currentPokemon, oppPoke); 
+		var attack2 = calcDmg(this.currentPokemon["Special Attack(s)"], this.currentPokemon, oppPoke);
+		if (attack1>attack2){
+			oppPoke.takeDmg(attack1);
+			return {Name: this.currentPokemon["Fast Attack(s)"].Name, Damage: attack1};
+		}else{
+			oppPoke.takeDmg(attack2);
+			return {Name: this.currentPokemon["Special Attack(s)"].Name, Damage: attack2};
+		}
 	}
 }
 
@@ -293,28 +333,48 @@ var EnemyGroup = function(){
 		}		
 	}
 
+
 	this.sumHP = function(){
 		var output = 0;
 		for(var i in this.group){
-			output = output +this.group[i].hp;
+			output = output + this.group[i].hp;
 		}
 		return output;
+	}
+
+	this.FULLHP=this.sumHP();
+
+	this.fainted = function(){
+		return this.currentPokemon.hp==0;
+	}
+
+	this.dealDmg = function(oppPoke){
+		// deals current pokemon's best dmg to oppPoke argument
+		var attack1 = calcDmg(this.currentPokemon["Fast Attack(s)"], this.currentPokemon, oppPoke); 
+		var attack2 = calcDmg(this.currentPokemon["Special Attack(s)"], this.currentPokemon, oppPoke);
+		if (attack1>attack2){
+			oppPoke.takeDmg(attack1);
+			return {Name: this.currentPokemon["Fast Attack(s)"].Name, Damage: attack1};
+		}else{
+			oppPoke.takeDmg(attack2);
+			return {Name: this.currentPokemon["Special Attack(s)"].Name, Damage: attack2};
+		}
 	}
 }
 
 
 module.exports ={
-whole : whole,
-getHighestDPS : getHighestDPS,
-checkContainment : checkContainment,
-effectiveness : effectiveness,
+// whole : whole,
+// getHighestDPS : getHighestDPS,
+// checkContainment : checkContainment,
+// effectiveness : effectiveness,
 calcDmg : calcDmg,
-Pokemon : Pokemon,
-TempPokemon : TempPokemon,
-replaceLow : replaceLow,
-findBestSix : findBestSix,
-sortLowestFirst : sortLowestFirst,
-randPokeGroup : randPokeGroup,
+// Pokemon : Pokemon,
+// TempPokemon : TempPokemon,
+// replaceLow : replaceLow,
+// findBestSix : findBestSix,
+// sortLowestFirst : sortLowestFirst,
+// randPokeGroup : randPokeGroup,
 PokeGroup : PokeGroup,
 EnemyGroup : EnemyGroup
 }
