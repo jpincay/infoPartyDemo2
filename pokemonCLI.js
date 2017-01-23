@@ -2,15 +2,6 @@
 var build = require ("./build.js");
 var myPokemon = require("./myPokemon.js");
 var query = require("cli-interact").getChar;
-// prompt.start();
-// console.log("what's your name?")
-// prompt.get(["name"], (err, result)=>{
-// 	if(result.name == "Bob"){
-// 		console.log("great!");
-// 	}else{
-// 		console.log("I don't lke you!");
-// 	}
-// })
 
 var PokemonCLI = function(){
 	//The CLI for Pokemon Revisited!
@@ -24,9 +15,6 @@ var PokemonCLI = function(){
 		// intro
 		this.intro();
 		// game play
-			// ask which pokemon to start with
-			// commence fight
-			// Tally score - by damage done
 		this.startGame();
 	}
 
@@ -44,19 +32,20 @@ var PokemonCLI = function(){
 		console.log("        \\_.-'       |__|    `-._ |              '-.|     '-.| |   |");
 		console.log("                                `'                            '-._|");
 		console.log("Pokemon Revisited! - An All Star Code Coding Challenge");
-		console.log("===================================");
+		console.log("===============OPPONENT===============");
 		console.log("You're opponent has the following Pokemon with 'perfect' stats");
 		this.enemy.printGroup();
-		console.log("===================================");
+		console.log("===============YOUR POKEMON===============");
 		console.log("You have the following Pokemon (a group you've filtered from 10,000 groups of random Pokemon)");
 		this.player.printGroup();
-		console.log("===================================");
+		console.log("===============START!===============");
 		console.log("Time to battle! Your score is calculated by the amount of damage you do to the enemy team (Max of " + this.enemy.FULLHP +")");
 	}
 
 	this.startGame = function(){
 		// Ask which pokemon to use first?
-		console.log("Your opponent sent out " + this.enemy.currentPokemon.Name + "!");
+		var temptypes = this.enemy.currentPokemon.Types.length > 1 ? this.enemy.currentPokemon.Types[0] + " + " +this.enemy.currentPokemon.Types[1]: this.enemy.currentPokemon.Types[0];
+		console.log("Your opponent sent out " + this.enemy.currentPokemon.Name+ " ("+ temptypes +") with " + this.enemy.currentPokemon.hpMax + " health!");
 		console.log("Select a pokemon to go first")
 		for(var i in this.player.group){
 			console.log((Number(i)+1) + ". "+ this.player.group[i].Name);
@@ -67,51 +56,70 @@ var PokemonCLI = function(){
 
 
 		while(this.player.sumHP()>0&&this.enemy.sumHP()>0){
-			// Looping until pokemon is fainted
+
+			console.log("==============FIGHT==============");
+			// Looping until all pokemon from player or enemy fainted
 			var enemyMove, playerMove, newPick, choices;
+			var firstSecond = Math.random()>.5; //decides which pokemon attacks first/second (random)
 			while (!this.player.fainted()&&!this.enemy.fainted()){
-				// console.log(this.player.sumHP());
-				// console.log(this.enemy.sumHP());
-				//enemy goes first b/c "perfect"
-				enemyMove = this.enemy.dealDmg(this.player.currentPokemon);
-				this.enemyDmg = this.enemyDmg + enemyMove.Damage; //keeping track of all dmg dealt
-				console.log("Enemy " + this.enemy.currentPokemon.Name + " used "+ enemyMove.Name + " dealing "+ enemyMove.Damage + " damage to " + this.player.currentPokemon.Name +"!");
-				
-				if(!this.player.fainted()){
-					playerMove = this.player.dealDmg(this.enemy.currentPokemon);
-					this.playerDmg = this.playerDmg + playerMove.Damage;//keeping track of all dmg dealt
-					console.log("Your " + this.player.currentPokemon.Name + " used "+ playerMove.Name + " dealing "+ playerMove.Damage + " damage to " + this.enemy.currentPokemon.Name +"!");
+				if(firstSecond){
+					this.enemyTurn();
+					if(!this.player.fainted()){
+						this.playerTurn();
+					}
+				}else{
+					this.playerTurn();
+					if(!this.enemy.fainted()){
+						this.enemyTurn();
+					}
 				}
 			}
 
+			console.log("==============RESULTS==============");
 			if(this.player.fainted() && this.player.sumHP()>0){
+				console.log("Enemy " + this.enemy.currentPokemon.Name + " has " + this.enemy.currentPokemon.hp + "/"+this.enemy.currentPokemon.hpMax +" health left")
 				console.log("Your " + this.player.currentPokemon.Name + " fainted! Pick a new pokemon.");
 				choices = "";
 				for( var i in this.player.group){
-					if (this.player.group[i].hp>0){
-						choices = choices + (Number(i)+1);
-						console.log((Number(i)+1)+". " + this.player.group[i].Name + " STATUS: OK");
+					var temptypes = this.player.group[i].Types.length > 1 ? this.player.group[i].Types[0] + " + " +this.player.group[i].Types[1]: this.player.group[i].Types[0];
+					if (this.player.group[i].hp==0){
+						console.log((Number(i)+1)+". " + this.player.group[i].Name + " STATUS: Fainted!");
 					}else{
-						console.log((Number(i)+1)+". " + this.player.group[i].Name + " STATUS: Fainted");
+						choices = choices + (Number(i)+1);
+						console.log((Number(i)+1)+". "+this.player.group[i].Name + " TYPE : " + temptypes + " HP: " + this.player.group[i].hp + " ATK: " + Math.floor(this.player.group[i].atk) + " DEF: " + Math.floor(this.player.group[i].def));
 					}
 				}
+
 				newPick = query("Which pokemon do you want to go next?", choices,false);
 				this.player.currentPokemon = this.player.group[Number(newPick)-1];
 			}else if(this.enemy.fainted()){
 				console.log("The enemy " + this.enemy.currentPokemon.Name + " fainted!");
 				this.changeEnemyPoke();
-				console.log("The enemy send out " + this.enemy.currentPokemon.Name);
+				var temptypes = this.enemy.currentPokemon.Types.length > 1 ? this.enemy.currentPokemon.Types[0] + " + " +this.enemy.currentPokemon.Types[1]: this.enemy.currentPokemon.Types[0];
+				console.log("Your opponent sent out " + this.enemy.currentPokemon.Name+ " ("+ temptypes +") with " + this.enemy.currentPokemon.hpMax + " health!");
 			}else{
 				if(this.player.sumHP()==0){
-					console.log("You were defeated, but managed to deal " + this.playerDmg + " damage and taking " + this.enemyDmg + " damage.")
+					console.log("You were defeated, but managed to deal " + this.playerDmg + "/"+this.enemy.FULLHP+ " damage and taking " + this.enemyDmg + " damage.")
 				}else if(this.enemy.sumHP()==0){
-					console.log("Congratulations! You've defeated the whole enemy team, dealing " + this.playerDmg + " damage, while taking " + this.enemyDmg + " damage!");
+					console.log("Congratulations! You've defeated the whole enemy team, dealing " + this.playerDmg + " damage, while taking " + this.enemyDmg + "/"+this.player.FULLHP+ " damage!");
 				}else{
 					console.log("Something wrong happened! #1");
 				}
 			}
 		}
 
+	}
+
+	this.enemyTurn = function(){
+		enemyMove = this.enemy.dealDmg(this.player.currentPokemon);
+		this.enemyDmg = this.enemyDmg + enemyMove.Damage; //keeping track of all dmg dealt
+		console.log("Enemy " + this.enemy.currentPokemon.Name + " used "+ enemyMove.Name + " dealing "+ enemyMove.Damage + " damage to " + this.player.currentPokemon.Name +"!");
+	}
+
+	this.playerTurn = function(){
+		playerMove = this.player.dealDmg(this.enemy.currentPokemon);
+		this.playerDmg = this.playerDmg + playerMove.Damage;//keeping track of all dmg dealt
+		console.log("Your " + this.player.currentPokemon.Name + " used "+ playerMove.Name + " dealing "+ playerMove.Damage + " damage to " + this.enemy.currentPokemon.Name +"!");
 	}
 
 	this.changeEnemyPoke = function(){

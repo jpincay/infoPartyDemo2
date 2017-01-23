@@ -291,6 +291,7 @@ var PokeGroup = function(){
 		}
 		return output;
 	}
+	this.FULLHP=this.sumHP();
 
 	this.dealDmg = function(attack,oppPoke){
 		// player pokemon does an attack on oppPoke, dealing dmg to it
