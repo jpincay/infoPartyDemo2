@@ -60,21 +60,27 @@ var PokemonCLI = function(){
 			console.log("==============FIGHT==============");
 			// Looping until all pokemon from player or enemy fainted
 			var enemyMove, playerMove, newPick, choices;
-			var firstSecond = Math.random()>.5; //decides which pokemon attacks first/second (random)
+			// var firstSecond = Math.random()>.5; //decides which pokemon attacks first/second (random)
+			// while (!this.player.fainted()&&!this.enemy.fainted()){
+			// 	if(firstSecond){
+			// 		this.enemyTurn();
+			// 		if(!this.player.fainted()){
+			// 			this.playerTurn();
+			// 		}
+			// 	}else{
+			// 		this.playerTurn();
+			// 		if(!this.enemy.fainted()){
+			// 			this.enemyTurn();
+			// 		}
+			// 	}
+			// }
 			while (!this.player.fainted()&&!this.enemy.fainted()){
-				if(firstSecond){
-					this.enemyTurn();
-					if(!this.player.fainted()){
-						this.playerTurn();
-					}
-				}else{
+				//"perfect" enemy always goes first
+				this.enemyTurn();
+				if(!this.player.fainted()){
 					this.playerTurn();
-					if(!this.enemy.fainted()){
-						this.enemyTurn();
-					}
 				}
 			}
-
 			console.log("==============RESULTS==============");
 			if(this.player.fainted() && this.player.sumHP()>0){
 				console.log("Enemy " + this.enemy.currentPokemon.Name + " has " + this.enemy.currentPokemon.hp + "/"+this.enemy.currentPokemon.hpMax +" health left")
@@ -111,14 +117,24 @@ var PokemonCLI = function(){
 	}
 
 	this.enemyTurn = function(){
+		var tempHP = this.player.currentPokemon.hp;
 		enemyMove = this.enemy.dealDmg(this.player.currentPokemon);
-		this.enemyDmg = this.enemyDmg + enemyMove.Damage; //keeping track of all dmg dealt
+		if (tempHP - enemyMove.Damage < 0){
+			this.enemyDmg = this.enemyDmg + enemyMove.Damage + (tempHP - enemyMove.Damage) ; //keeping track of all dmg dealt
+		}else{
+			this.enemyDmg = this.enemyDmg + enemyMove.Damage;
+		}
 		console.log("Enemy " + this.enemy.currentPokemon.Name + " used "+ enemyMove.Name + " dealing "+ enemyMove.Damage + " damage to " + this.player.currentPokemon.Name +"!");
 	}
 
 	this.playerTurn = function(){
+		var tempHP = this.enemy.currentPokemon.hp;
 		playerMove = this.player.dealDmg(this.enemy.currentPokemon);
-		this.playerDmg = this.playerDmg + playerMove.Damage;//keeping track of all dmg dealt
+		if (tempHP - playerMove.Damage < 0){
+			this.playerDmg = this.playerDmg + playerMove.Damage + (tempHP - playerMove.Damage) ; //keeping track of all dmg dealt
+		}else{
+			this.playerDmg = this.playerDmg + playerMove.Damage;
+		}
 		console.log("Your " + this.player.currentPokemon.Name + " used "+ playerMove.Name + " dealing "+ playerMove.Damage + " damage to " + this.enemy.currentPokemon.Name +"!");
 	}
 
