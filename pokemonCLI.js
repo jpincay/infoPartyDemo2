@@ -60,27 +60,29 @@ var PokemonCLI = function(){
 			console.log("==============FIGHT==============");
 			// Looping until all pokemon from player or enemy fainted
 			var enemyMove, playerMove, newPick, choices;
-			// var firstSecond = Math.random()>.5; //decides which pokemon attacks first/second (random)
-			// while (!this.player.fainted()&&!this.enemy.fainted()){
-			// 	if(firstSecond){
-			// 		this.enemyTurn();
-			// 		if(!this.player.fainted()){
-			// 			this.playerTurn();
-			// 		}
-			// 	}else{
-			// 		this.playerTurn();
-			// 		if(!this.enemy.fainted()){
-			// 			this.enemyTurn();
-			// 		}
-			// 	}
-			// }
+			var firstSecond = Math.random()>.5; //decides which pokemon attacks first/second (random)
 			while (!this.player.fainted()&&!this.enemy.fainted()){
-				//"perfect" enemy always goes first
-				this.enemyTurn();
-				if(!this.player.fainted()){
+				if(firstSecond){
+					this.enemyTurn();
+					if(!this.player.fainted()){
+						this.playerTurn();
+					}
+				}else{
 					this.playerTurn();
+					if(!this.enemy.fainted()){
+						this.enemyTurn();
+					}
 				}
 			}
+
+
+			// while (!this.player.fainted()&&!this.enemy.fainted()){
+			// 	//"perfect" enemy always goes first
+			// 	this.enemyTurn();
+			// 	if(!this.player.fainted()){
+			// 		this.playerTurn();
+			// 	}
+			// }
 			console.log("==============RESULTS==============");
 			if(this.player.fainted() && this.player.sumHP()>0){
 				console.log("Enemy " + this.enemy.currentPokemon.Name + " has " + this.enemy.currentPokemon.hp + "/"+this.enemy.currentPokemon.hpMax +" health left")
@@ -98,7 +100,7 @@ var PokemonCLI = function(){
 
 				newPick = query("Which pokemon do you want to go next?", choices,false);
 				this.player.currentPokemon = this.player.group[Number(newPick)-1];
-			}else if(this.enemy.fainted()){
+			}else if(this.enemy.fainted() && this.enemy.sumHP()>0){
 				console.log("The enemy " + this.enemy.currentPokemon.Name + " fainted!");
 				this.changeEnemyPoke();
 				var temptypes = this.enemy.currentPokemon.Types.length > 1 ? this.enemy.currentPokemon.Types[0] + " + " +this.enemy.currentPokemon.Types[1]: this.enemy.currentPokemon.Types[0];
@@ -107,6 +109,7 @@ var PokemonCLI = function(){
 				if(this.player.sumHP()==0){
 					console.log("You were defeated, but managed to deal " + this.playerDmg + "/"+this.enemy.FULLHP+ " damage and taking " + this.enemyDmg + " damage.")
 				}else if(this.enemy.sumHP()==0){
+					console.log("The enemy " + this.enemy.currentPokemon.Name + " fainted!");
 					console.log("Congratulations! You've defeated the whole enemy team, dealing " + this.playerDmg + " damage, while taking " + this.enemyDmg + "/"+this.player.FULLHP+ " damage!");
 				}else{
 					console.log("Something wrong happened! #1");
